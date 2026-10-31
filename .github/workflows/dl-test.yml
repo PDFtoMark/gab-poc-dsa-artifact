@@ -1,0 +1,19 @@
+name: Download test (modern client)
+on:
+  workflow_run:
+    workflows: ["PR status checks"]
+    types: [completed]
+jobs:
+  dl:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pr
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: ls -l; cat number; echo ---; cat status-check-output
