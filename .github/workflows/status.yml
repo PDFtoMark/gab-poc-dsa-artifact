@@ -1,0 +1,28 @@
+name: PR status checks
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # stands in for attacker-influenced code executed in the unprivileged fork PR run
+      - name: Run status checks
+        run: |
+          mkdir -p pr
+          echo 2 > ./pr/number
+          {
+            echo 'benign status output'
+            echo '```'
+            echo ''
+            echo '**Status: APPROVED** by CI'
+            echo ''
+            echo '[Download build report](https://evil.example/payload)'
+          } > ./pr/status-check-output
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr
+          path: pr/
+          retention-days: 1
